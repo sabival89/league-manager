@@ -1,53 +1,39 @@
 import { MemberRole } from '../../core/enums/member-role.enum';
 import { MemberStatus } from '../../core/enums/member-status.enum';
 import { Person } from '../../person/entities/person.entity';
-import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
+import { ChildEntity, Column, OneToOne } from 'typeorm';
 import { Team } from '../../team/entities/team.entity';
-import { IsUUID } from 'class-validator';
 
-@Entity({ schema: 'league' })
-export class Member {
-  @PrimaryColumn('uuid')
-  @IsUUID()
-  id: string;
-
-  @Column()
-  @IsUUID()
-  @OneToOne(() => Person, (person_id) => person_id.id)
-  person_id: string;
-
-  @Column({ type: 'enum', enum: MemberRole })
-  role: MemberRole;
-
-  @Column({ type: 'enum', enum: MemberStatus })
-  status?: MemberStatus;
-
+@ChildEntity()
+export class Member extends Person {
   @Column({ default: 0 })
-  balance?: number;
+  balance: number;
 
   @Column()
   @OneToOne(() => Team, (teamId) => teamId.id)
-  // @JoinColumn()
-  team_id?: string;
+  team_id: string;
 
-  @Column({ type: 'simple-json' })
-  stats?: { shotsOnGoal: number };
+  @Column({ type: 'jsonb', default: { shotsOnGoal: 0 } })
+  stats: { shotsOnGoal: number };
 
   constructor(
-    id: string,
-    person_id: string,
-    role: MemberRole,
-    status: MemberStatus,
-    balance: number,
-    team_id: string,
-    stats: { shotsOnGoal: number },
+    id?: string,
+    name?: string,
+    last_name?: string,
+    phone?: string,
+    email?: string,
+    dob?: Date,
+    role?: MemberRole,
+    status?: MemberStatus,
+    balance?: number,
+    team_id?: string,
+    stats?: { shotsOnGoal: number },
   ) {
-    this.id = id;
-    this.person_id = person_id;
+    super(id, name, last_name, phone, email, dob, role, status);
     this.role = role;
-    this.status = status ?? MemberStatus.active;
-    this.balance = balance ?? 0;
-    this.team_id = team_id ?? null;
-    this.stats = stats ?? { shotsOnGoal: 0 };
+    this.status = status ?? MemberStatus.inactive;
+    this.balance = balance;
+    this.team_id = team_id;
+    this.stats = stats;
   }
 }

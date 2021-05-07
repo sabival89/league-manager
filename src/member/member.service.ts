@@ -1,16 +1,20 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Person } from 'src/person/entities/person.entity';
+import { MemberStatus } from '../core/enums/member-status.enum';
+import { CreatePersonDto } from '../person/dto/create-person.dto';
+import { PersonMapper } from '../person/mappers/person.map';
 import { League_OKException } from '../core/exceptions/league-ok.exception';
 import { PersonRepository } from '../person/person.repository';
-import {
-  CreateMemberDto,
-  CreateMemberPersonDto,
-} from './dto/create-member.dto';
+import { CreateMemberDto } from './dto/create-member.dto';
+import { CreateMemberPaymentDto } from './dto/create-payment.member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
+import { UpdateMemberStatusDto } from './dto/update-status-member.dto';
+import { Member } from './entities/member.entity';
 import { MemberRepository } from './entities/member.repository';
-import { MemberPersonMapper } from './mappers/member-person.mapper';
-import { MemberMapper } from './mappers/member.mapper';
 
 @Injectable()
 export class MemberService {
@@ -28,12 +32,47 @@ export class MemberService {
   ) {}
 
   /**
-   * Ceate payment
+   * Create payment
    * @param createMemberDto
    * @returns
    */
-  createPayment(createMemberDto: CreateMemberDto) {
-    return 'This action adds a new member';
+  async createPayment(
+    memberId: string,
+    memberPaymentDto: CreateMemberPaymentDto,
+  ) {
+    // Check that member exists
+    return await this.memberRepository
+      .findOneOrFail({ where: { id: memberId } })
+      .then(async (member) => {
+        const updateMemberStatus =
+          memberPaymentDto.balance > 0
+            ? MemberStatus.inactive
+            : MemberStatus.active;
+
+        return await this.memberRepository
+          .createQueryBuilder()
+          .update(Member)
+          .set(
+            PersonMapper.toDomainUpdate(member.id, {
+              ...member,
+              ...{
+                status: updateMemberStatus,
+                balance: memberPaymentDto.balance,
+              },
+            }),
+          )
+          .where('id = :id', { id: memberId })
+          .execute()
+          .then(() => new League_OKException('Payment was successful'))
+          .catch((error) => new InternalServerErrorException(error));
+      })
+      .catch(
+        (error) =>
+          new InternalServerErrorException({
+            message: 'Member not found',
+            description: error,
+          }),
+      );
   }
 
   /**
@@ -41,54 +80,131 @@ export class MemberService {
    * @param memberPersonDto
    * @returns
    */
-  async createMember(memberPersonDto: CreateMemberPersonDto) {
-    return await this.personRepository
-      .save(MemberPersonMapper.toDomain(memberPersonDto))
-      .then(async (response) => {
-        const memberDto = {
-          person_id: response.id,
-          role: memberPersonDto.role,
-        };
-
-        return await this.memberRepository
-          .save(MemberMapper.toDomain(memberDto))
-          .then(() => new League_OKException('Member was successfully created'))
-          .catch(async (error) => {
-            await this.personRepository
-              .remove(response)
-              .then(() => new League_OKException('Rolled back inserts'));
-            return new InternalServerErrorException(error.detail);
-          });
-      })
-      .catch((error) => new InternalServerErrorException(error.detail));
+  async createMember(createMemberDto: CreatePersonDto & CreateMemberDto) {
+    return await this.memberRepository
+      .save(PersonMapper.toDomain(createMemberDto))
+      .then(
+        async (member) =>
+          new League_OKException({
+            status: 'Member was successfully created',
+            member_id: member.id,
+          }),
+      )
+      .catch(async (error) => new InternalServerErrorException(error.message));
   }
 
+  /**
+   * Find only one member
+   * @TODO
+   * - Write return messages for found and not found cases
+   * @param memberId
+   * @returns
+   */
   async findOneMember(memberId: string) {
-    const foundMember = await this.memberRepository
-      .createQueryBuilder('member')
-      .select(['*', 'member.id AS id'])
-      .innerJoin(Person, 'person', 'member.person_id = person.id')
-      .where('member.id = :memberId', { memberId })
-      .getRawOne()
-      .catch(console.error);
-    console.log(foundMember);
-
-    return `This action returns a #${memberId} member`;
+    return await this.memberRepository
+      .findOneOrFail({
+        where: { id: memberId },
+      })
+      .then((member) => member)
+      .catch(
+        (error) =>
+          new InternalServerErrorException({
+            message: 'Member not found',
+            description: error,
+          }),
+      );
   }
 
-  findAllFreeAgents() {
-    return `This action returns all member`;
+  /**
+   * Find all members without a team
+   * @TODO
+   * @returns
+   */
+  async findAllFreeAgents() {
+    return 'All free agents';
   }
 
-  updateMember(memberId: string, updateMemberDto: UpdateMemberDto) {
-    return `This action updates a #${memberId} member`;
+  /**
+   * Find all members
+   * @returns
+   */
+  async findAllMembers() {
+    return await this.memberRepository.find();
   }
 
-  updateMemberStatus(memberId: string, updateMemberDto: UpdateMemberDto) {
-    return `This action updates a #${memberId} member`;
+  /**
+   * Update the profile of a given member
+   * @param memberId
+   * @param updateMemberDto
+   * @returns
+   */
+  async updateMember(memberId: string, updateMemberDto: UpdateMemberDto) {
+    return await this.memberRepository
+      .findOneOrFail(memberId)
+      .then(async (member) => {
+        return await this.memberRepository
+          .createQueryBuilder()
+          .update(Member)
+          .set(
+            PersonMapper.toDomainUpdate(memberId, {
+              ...member,
+              ...updateMemberDto,
+            }),
+          )
+          .where('id = :id', { id: memberId })
+          .execute()
+          .then(() => new League_OKException('update was successfully'))
+          .catch((error) => new InternalServerErrorException(error.message));
+      })
+      .catch(() => new NotFoundException('Member does not exist'));
   }
 
-  removeMember(memberId: string) {
-    return `This action removes a #${memberId} member`;
+  /**
+   * Update  a given member's status
+   * @TODO
+   * - Cannot update status and not modify balance
+   * @param memberId
+   * @param updateMemberStatusDto
+   * @returns
+   */
+  async updateMemberStatus(
+    memberId: string,
+    updateMemberStatusDto: UpdateMemberStatusDto,
+  ) {
+    return await this.memberRepository
+      .findOneOrFail(memberId)
+      .then(async (member) => {
+        return await this.memberRepository
+          .createQueryBuilder()
+          .update(Member)
+          .set(
+            PersonMapper.toDomainUpdate(memberId, {
+              ...member,
+              ...updateMemberStatusDto,
+            }),
+          )
+          .where('id = :id', { id: memberId })
+          .execute()
+          .then(() => new League_OKException('Status was updated successfully'))
+          .catch((error) => new InternalServerErrorException(error.message));
+      })
+      .catch(() => new NotFoundException('Member does not exist'));
+  }
+
+  /**
+   * Delete a given member
+   * @param memberId
+   * @returns
+   */
+  async removeMember(memberId: string) {
+    return await this.memberRepository
+      .findOneOrFail(memberId)
+      .then(async () => {
+        return await this.memberRepository
+          .delete(memberId)
+          .then(() => new League_OKException('member was deleted successfully'))
+          .catch((error) => new InternalServerErrorException(error));
+      })
+      .catch(() => new NotFoundException('Member does not exist'));
   }
 }

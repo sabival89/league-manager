@@ -1,10 +1,11 @@
-import { IsUUID } from 'class-validator';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { MemberRole } from '../../core/enums/member-role.enum';
+import { MemberStatus } from '../../core/enums/member-status.enum';
+import { Column, Entity, PrimaryColumn, TableInheritance } from 'typeorm';
 
 @Entity({ schema: 'league' })
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class Person {
-  @PrimaryColumn('uuid')
-  @IsUUID()
+  @PrimaryColumn('uuid', { type: 'varchar', unique: true })
   id: string;
 
   @Column()
@@ -16,11 +17,17 @@ export class Person {
   @Column()
   phone: string;
 
-  @Column()
+  @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column()
+  @Column({ type: 'date' })
   dob: Date;
+
+  @Column({ type: 'enum', enum: MemberRole })
+  role: MemberRole;
+
+  @Column({ type: 'enum', enum: MemberStatus, default: MemberStatus.active })
+  status: MemberStatus;
 
   constructor(
     id: string,
@@ -29,6 +36,8 @@ export class Person {
     phone: string,
     email: string,
     dob: Date,
+    role: MemberRole,
+    status: MemberStatus,
   ) {
     this.id = id;
     this.name = name;
@@ -36,5 +45,7 @@ export class Person {
     this.phone = phone;
     this.email = email;
     this.dob = dob;
+    this.role = role;
+    this.status = status;
   }
 }

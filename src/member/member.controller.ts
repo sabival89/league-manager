@@ -7,14 +7,14 @@ import {
   Param,
   Delete,
   ValidationPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { MemberService } from './member.service';
-import {
-  CreateMemberDto,
-  CreateMemberPersonDto,
-} from './dto/create-member.dto';
+import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UpdateMemberStatusDto } from './dto/update-status-member.dto';
+import { CreateMemberPaymentDto } from './dto/create-payment.member.dto';
 
 @ApiTags('Member')
 @Controller('member')
@@ -22,45 +22,56 @@ export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
   @Post()
-  createMember(
-    @Body(new ValidationPipe()) createMemberToPersonDto: CreateMemberPersonDto,
+  async createMember(
+    @Body(new ValidationPipe()) createMemberDto: CreateMemberDto,
   ) {
-    return this.memberService.createMember(createMemberToPersonDto);
+    return this.memberService.createMember(createMemberDto);
   }
 
   @Post(':id/payment')
-  createPayment(@Body() createMemberDto: CreateMemberDto) {
-    return this.memberService.createPayment(createMemberDto);
+  async createPayment(
+    @Param('id', ParseUUIDPipe) memberId: string,
+    @Body(new ValidationPipe()) createMemberPaymentDto: CreateMemberPaymentDto,
+  ) {
+    return this.memberService.createPayment(memberId, createMemberPaymentDto);
   }
 
   @Get(':id')
-  findOneMember(@Param('id') memberId: string) {
+  async findOneMember(@Param('id', ParseUUIDPipe) memberId: string) {
     return this.memberService.findOneMember(memberId);
   }
 
-  @Get('/free-agent')
-  findAllFreeAgents() {
+  @Get()
+  async findAllMembers() {
+    return this.memberService.findAllMembers();
+  }
+
+  @Get('free-agents')
+  async findAllFreeAgents() {
     return this.memberService.findAllFreeAgents();
   }
 
   @Patch(':id')
-  updateMember(
-    @Param('id') memberId: string,
-    @Body() updateMemberDto: UpdateMemberDto,
+  async updateMember(
+    @Param('id', ParseUUIDPipe) memberId: string,
+    @Body(new ValidationPipe()) updateMemberDto: UpdateMemberDto,
   ) {
     return this.memberService.updateMember(memberId, updateMemberDto);
   }
 
   @Patch(':id/status')
-  updateMemberStatus(
-    @Param('id') memberId: string,
-    @Body() updateMemberDto: UpdateMemberDto,
+  async updateMemberStatus(
+    @Param('id', ParseUUIDPipe) memberId: string,
+    @Body(new ValidationPipe()) updateMemberStatusDto: UpdateMemberStatusDto,
   ) {
-    return this.memberService.updateMemberStatus(memberId, updateMemberDto);
+    return this.memberService.updateMemberStatus(
+      memberId,
+      updateMemberStatusDto,
+    );
   }
 
   @Delete(':id')
-  removeMember(@Param('id') memberId: string) {
+  async removeMember(@Param('id', ParseUUIDPipe) memberId: string) {
     return this.memberService.removeMember(memberId);
   }
 }

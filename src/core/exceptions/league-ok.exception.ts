@@ -8,7 +8,7 @@ export class League_OKException extends HttpException {
    * Swyft Http OK Response Exception
    * @param message
    */
-  constructor(message: string) {
+  constructor(message: string | Record<string, string>) {
     super(
       {
         status: HttpStatus.OK,
