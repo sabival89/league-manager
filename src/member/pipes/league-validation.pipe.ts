@@ -16,15 +16,18 @@ export class ValidationPipe implements PipeTransform<any> {
     const object = plainToClass(metatype, value);
     const errors = await validate(object);
 
-    // Check whether errors have children
+    if (!Object.keys(object).length) {
+      throw new BadRequestException('Payload cannot be empty');
+    }
+
     if (errors.length > 0) {
+      // Check whether errors have children
       const [validationError] = errors;
       if (validationError.children.length) {
         throw new BadRequestException(
           this.printErrors(validationError.children),
         );
       } else {
-        console.log(validationError.constraints);
         throw new BadRequestException(
           Object.values(validationError.constraints),
         );

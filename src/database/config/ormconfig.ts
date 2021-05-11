@@ -3,7 +3,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 const config: ConnectionOptions = {
   type: 'postgres',
-  host: 'host.docker.internal',
+  host: '192.168.183.18',
   port: 5432,
   username: 'vaduaka',
   password: 'protected',

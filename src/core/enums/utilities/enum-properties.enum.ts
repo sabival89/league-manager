@@ -1,8 +1,11 @@
+/**
+ * Concatenate and print Enum properties
+ */
 export class EnumProps {
   public static joinEnum(
     enumName: Record<string, unknown>,
-    seperator: string,
+    seperator?: string,
   ): string {
-    return Object.keys(enumName).join(` ${seperator} `);
+    return Object.keys(enumName).join(` ${seperator ?? '|'} `);
   }
 }

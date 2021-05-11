@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsDateString,
   IsEmail,
   IsEnum,
-  IsISO8601,
   IsMobilePhone,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator';
 import { MemberRole } from 'src/core/enums/member-role.enum';
@@ -21,19 +22,19 @@ export class CreatePersonDto {
   @MaxLength(25)
   last_name: string;
 
-  @ApiProperty({ example: '5756390000' })
+  @ApiProperty({ example: '5756390000', required: false })
   @IsMobilePhone('en-US')
-  phone?: string;
+  phone: string;
 
   @ApiProperty({ example: 'user@domain.com' })
   @IsEmail()
-  email?: string;
+  email: string;
 
   @ApiProperty({ example: 'YYYY-MM-DD' })
-  @IsISO8601({ strict: true })
+  @IsDateString({ strict: true })
   dob: Date;
 
-  @ApiProperty({ example: EnumProps.joinEnum(MemberRole, '|') })
+  @ApiProperty({ example: EnumProps.joinEnum(MemberRole) })
   @IsEnum(MemberRole, {
     message: `Role must match one of the following: ${EnumProps.joinEnum(
       MemberRole,
@@ -41,4 +42,8 @@ export class CreatePersonDto {
     )}`,
   })
   role: MemberRole;
+
+  @ApiProperty({ example: 19 })
+  @Min(18)
+  age: number;
 }

@@ -1,25 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { MemberRole } from 'src/core/enums/member-role.enum';
 import { CreateMemberDto } from './create-member.dto';
 
-export class UpdateMemberDto extends CreateMemberDto {
-  @ApiProperty()
+export class UpdateMemberDto extends PartialType(CreateMemberDto) {
+  @ApiProperty({ example: 'facb671e-d4de-4c17-a347-b790b0b09596' })
   @IsOptional()
-  name: string;
-
-  @IsOptional()
-  last_name: string;
-
-  @IsOptional()
-  phone: string;
-
-  @IsOptional()
-  email: string;
-
-  @IsOptional()
-  dob: Date;
-
-  @IsOptional()
-  role: MemberRole;
+  team_id: string;
 }

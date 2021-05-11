@@ -1,20 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsUUID } from 'class-validator';
-import { MemberStatus } from '../../core/enums/member-status.enum';
+import { IsOptional, IsUUID } from 'class-validator';
 
 export class CreateTeamDto {
   @ApiProperty()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'fd04aa32-6fcb-48f6-9d73-dbe00c6db2da' })
   @IsUUID()
   coach: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'fd04aa32-6fcb-48f6-9d73-dbe00c6db2da',
+    required: false,
+  })
   @IsUUID()
+  @IsOptional()
   captain: string;
-
-  @ApiProperty({ example: 'active | inactive' })
-  @IsEnum(MemberStatus)
-  status: string;
 }

@@ -5,7 +5,7 @@ import { Column, Entity, PrimaryColumn, TableInheritance } from 'typeorm';
 @Entity({ schema: 'league' })
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class Person {
-  @PrimaryColumn('uuid', { type: 'varchar', unique: true })
+  @PrimaryColumn('uuid', { unique: true })
   id: string;
 
   @Column()
@@ -29,6 +29,9 @@ export class Person {
   @Column({ type: 'enum', enum: MemberStatus, default: MemberStatus.active })
   status: MemberStatus;
 
+  @Column()
+  age: number;
+
   constructor(
     id: string,
     name: string,
@@ -37,6 +40,7 @@ export class Person {
     email: string,
     dob: Date,
     role: MemberRole,
+    age: number,
     status: MemberStatus,
   ) {
     this.id = id;
@@ -46,6 +50,7 @@ export class Person {
     this.email = email;
     this.dob = dob;
     this.role = role;
+    this.age = age;
     this.status = status;
   }
 }

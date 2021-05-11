@@ -5,7 +5,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
  */
 export class League_OKException extends HttpException {
   /**
-   * Swyft Http OK Response Exception
+   * League Http OK Response Exception
    * @param message
    */
   constructor(message: string | Record<string, string>) {

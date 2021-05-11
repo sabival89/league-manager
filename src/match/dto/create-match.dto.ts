@@ -1,24 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsMilitaryTime } from 'class-validator';
-import { MemberStatus } from '../../core/enums/member-status.enum';
+import { IsDateString, IsEnum, IsUUID, Max, Min } from 'class-validator';
+import { LocationEnum } from '../../core/enums/location.enum';
+import { EnumProps } from '../../core/enums/utilities/enum-properties.enum';
 
 export class CreateMatchDto {
-  @ApiProperty()
+  @ApiProperty({ example: '6c7eff25-f0e7-4e55-ab44-782695dc3ac4' })
+  @IsUUID()
   home: string;
 
-  @ApiProperty()
-  team: string;
+  @ApiProperty({ example: '6c7eff25-f0e7-4e55-ab44-782695dc3ac4' })
+  @IsUUID()
+  away: string;
 
   @ApiProperty()
-  homeScore: number;
+  @Min(0)
+  @Max(20)
+  home_score: number;
 
   @ApiProperty()
-  awayScore: number;
+  @Min(0)
+  @Max(20)
+  away_score: number;
 
-  @IsMilitaryTime()
-  @ApiProperty()
-  played: string;
+  @IsDateString()
+  @ApiProperty({ example: 'YYYY-MM-DD HH:MM' })
+  played: Date;
 
-  @IsEnum(MemberStatus)
-  location: string;
+  @ApiProperty({
+    example: `${EnumProps.joinEnum(LocationEnum, 'OR')}`,
+    required: true,
+  })
+  @IsEnum(LocationEnum, {
+    message: `Location must match one of the following: ${EnumProps.joinEnum(
+      LocationEnum,
+      'OR',
+    )}`,
+  })
+  location: LocationEnum;
 }

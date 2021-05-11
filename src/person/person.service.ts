@@ -1,22 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateMemberDto } from 'src/member/dto/create-member.dto';
-import { CreatePersonDto } from './dto/create-person.dto';
-import { PersonMapper } from './mappers/person.map';
-import { PersonRepository } from './person.repository';
+import { PersonRepository } from './repositories/person.repository';
 
 @Injectable()
 export class PersonService {
+  /**
+   * Inject dependencies
+   * @param personRepository
+   */
   constructor(
     @InjectRepository(PersonRepository)
     private personRepository: PersonRepository,
   ) {}
 
-  createPerson(createPersonDto: CreatePersonDto & CreateMemberDto) {
-    // const domain = PersonMapper.toDomain(createPersonDto);
-    // return this.personRepository.save(domain);
-  }
-  findOnePerson(id: number) {
-    return `This action returns a #${id} person`;
+  /**
+   * Find a give person
+   * @param personId
+   * @returns
+   */
+  async findOnePerson(personId: string) {
+    return this.personRepository
+      .findOneOrFail(personId)
+      .catch((error) => new InternalServerErrorException(error.message));
   }
 }
