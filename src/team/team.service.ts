@@ -19,7 +19,6 @@ import { MemberRepository } from '../member/repositories/member.repository';
 import { Member } from '../member/entities/member.entity';
 import { MatchRepository } from '../match/repositories/match.repository';
 import { TeamStatsResponse } from './entities/team-response.entity';
-import { check } from 'prettier';
 
 @Injectable()
 export class TeamService {
