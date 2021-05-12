@@ -92,9 +92,10 @@ export class TeamService {
         if (validateRoles instanceof HttpException) {
           return validateRoles;
         } else {
-          const domain = TeamMapper.toDomain(createTeamDto);
+          const domain: Team = TeamMapper.toDomain(createTeamDto);
+
           return await this.teamRepository
-            .save(TeamMapper.toDomain(createTeamDto))
+            .save(domain)
             .then(
               async (team) =>
                 // Add coach to team
@@ -104,29 +105,35 @@ export class TeamService {
                   .set({ team_id: team.id })
                   .where('id = :id', { id: team.coach })
                   .execute()
-                  .then(async () =>
-                    // Add captain to team
-                    this.memberRepository
-                      .createQueryBuilder()
-                      .update(Member)
-                      .set({ team_id: domain.captain })
-                      .where('id = :id', { id: team.captain })
-                      .execute()
-                      .then(
-                        () =>
-                          new League_OKException({
-                            status: 'Team was successfully created',
-                            team_id: team.id,
-                          }),
-                      )
-                      .catch(
-                        (error) =>
-                          new InternalServerErrorException(error.message),
-                      ),
+                  .then(
+                    async () =>
+                      // Add captain to team
+                      await this.memberRepository
+                        .createQueryBuilder()
+                        .update(Member)
+                        .set({ team_id: team.id })
+                        .where('id = :id', { id: team.captain })
+                        .execute()
+                        .then(
+                          () =>
+                            new League_OKException({
+                              status: 'Team was successfully created',
+                              team_id: team.id,
+                            }),
+                        )
+                        .catch(
+                          (error) =>
+                            new InternalServerErrorException(error.message),
+                        ),
                   )
                   .catch(
                     (error) => new InternalServerErrorException(error.message),
                   ),
+              (team) =>
+                new League_OKException({
+                  status: 'Team was successfully created',
+                  team_id: team.id,
+                }),
             )
             .catch(
               async (error) =>
@@ -274,6 +281,7 @@ export class TeamService {
 
   /**
    * Update a given team
+   *
    * @Todo
    *  - There is a max number of members per team
    * - captain or coach must belong to the subject team

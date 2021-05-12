@@ -65,7 +65,7 @@ export class MemberService {
     return await this.memberRepository
       .findOneOrFail({ where: { id: memberId } })
       .then(async (member) => {
-        const updateMemberStatus =
+        const updateMemberStatus: MemberStatus =
           memberPaymentDto.balance > 0
             ? MemberStatus.inactive
             : MemberStatus.active;
@@ -140,16 +140,14 @@ export class MemberService {
   }
 
   /**
+   * Update the profile of a given member
    * @TODO
    * - Once a members balance is 0, the member should be marked as active If they were inactive
-   * Update the profile of a given member
    * @param memberId
    * @param updateMemberDto
    * @returns
    */
   async updateMember(memberId: string, updateMemberDto: UpdateMemberDto) {
-    // if(updateMemberDto);
-
     return await this.memberRepository
       .findOneOrFail(memberId)
       .then(async (member) => {

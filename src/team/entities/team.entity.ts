@@ -18,19 +18,19 @@ export class Team {
   name: string;
 
   @Column({ type: 'uuid' })
-  @OneToOne(() => Member, (member) => member.id)
+  @OneToOne(() => Member, (member) => member.id, { onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'coach' })
   coach: string;
 
   @Column({ type: 'uuid', nullable: true })
-  @OneToOne(() => Member, (member) => member.id)
+  @OneToOne(() => Member, (member) => member.id, { onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'captain' })
   captain: string;
 
   @Column({ type: 'enum', enum: TeamStatus, default: TeamStatus.inactive })
   status: TeamStatus;
 
-  @OneToMany(() => Member, (member) => member.team_id)
+  @OneToMany(() => Member, (member) => member.team_id, { onUpdate: 'CASCADE' })
   member: Member[];
 
   constructor(

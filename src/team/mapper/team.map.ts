@@ -16,7 +16,7 @@ export class TeamMapper {
       uuidv4().toString(),
       raw.name,
       raw.coach,
-      null,
+      raw.captain,
       TeamStatus.inactive,
     );
   }

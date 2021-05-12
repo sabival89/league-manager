@@ -21,8 +21,11 @@ export class MatchService {
    * @param teamRepository
    */
   constructor(
-    @InjectRepository(MatchRepository) private matchRepository: MatchRepository,
-    @InjectRepository(TeamRepository) private teamRepository: TeamRepository,
+    @InjectRepository(MatchRepository)
+    private matchRepository: MatchRepository,
+
+    @InjectRepository(TeamRepository)
+    private teamRepository: TeamRepository,
   ) {}
 
   /**

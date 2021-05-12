@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class leagueTables1620754191897 implements MigrationInterface {
-  name = 'leagueTables1620754191897';
+export class leagueTables1620833153839 implements MigrationInterface {
+  name = 'leagueTables1620833153839';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -11,7 +11,7 @@ export class leagueTables1620754191897 implements MigrationInterface {
       `CREATE TYPE "league"."person_status_enum" AS ENUM('active', 'inactive', 'suspended')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "league"."person" ("id" uuid NOT NULL, "name" character varying NOT NULL, "last_name" character varying NOT NULL, "phone" character varying NOT NULL, "email" character varying NOT NULL, "dob" date NOT NULL, "role" "league"."person_role_enum" NOT NULL, "status" "league"."person_status_enum" NOT NULL DEFAULT 'active', "balance" integer DEFAULT '0', "team_id" uuid, "stats" jsonb DEFAULT '{"shotsOnGoal":0}', "type" character varying NOT NULL, CONSTRAINT "UQ_f1afee83e7625c5feb76dd574c2" UNIQUE ("email"), CONSTRAINT "PK_28d502b7fa8639086d924aab843" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "league"."person" ("id" uuid NOT NULL, "name" character varying NOT NULL, "last_name" character varying NOT NULL, "phone" character varying NOT NULL, "email" character varying NOT NULL, "dob" date NOT NULL, "role" "league"."person_role_enum" NOT NULL, "status" "league"."person_status_enum" NOT NULL DEFAULT 'active', "age" integer NOT NULL, "balance" integer DEFAULT '0', "team_id" uuid, "stats" jsonb DEFAULT '{"shotsOnGoal":0}', "type" character varying NOT NULL, CONSTRAINT "UQ_f1afee83e7625c5feb76dd574c2" UNIQUE ("email"), CONSTRAINT "PK_28d502b7fa8639086d924aab843" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_1f98f73c4b52d52a75b82096de" ON "league"."person" ("type") `,
@@ -29,13 +29,13 @@ export class leagueTables1620754191897 implements MigrationInterface {
       `CREATE TABLE "league"."match" ("id" uuid NOT NULL, "home" uuid NOT NULL, "away" uuid NOT NULL, "home_score" integer NOT NULL, "away_score" integer NOT NULL, "played" TIMESTAMP NOT NULL, "location" "league"."match_location_enum" NOT NULL, CONSTRAINT "PK_f8795ba326176079bfda42ffbb4" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `ALTER TABLE "league"."person" ADD CONSTRAINT "FK_e6fcff0f5d3c939a36c71e9e420" FOREIGN KEY ("team_id") REFERENCES "league"."team"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+      `ALTER TABLE "league"."person" ADD CONSTRAINT "FK_e6fcff0f5d3c939a36c71e9e420" FOREIGN KEY ("team_id") REFERENCES "league"."team"("id") ON DELETE SET NULL ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
-      `ALTER TABLE "league"."team" ADD CONSTRAINT "FK_229a6f75d8d2f13a73936ea2d89" FOREIGN KEY ("coach") REFERENCES "league"."person"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+      `ALTER TABLE "league"."team" ADD CONSTRAINT "FK_229a6f75d8d2f13a73936ea2d89" FOREIGN KEY ("coach") REFERENCES "league"."person"("id") ON DELETE NO ACTION ON UPDATE CASCADE`,
     );
     await queryRunner.query(
-      `ALTER TABLE "league"."team" ADD CONSTRAINT "FK_b060b9954ab36b76cb5d23a290b" FOREIGN KEY ("captain") REFERENCES "league"."person"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+      `ALTER TABLE "league"."team" ADD CONSTRAINT "FK_b060b9954ab36b76cb5d23a290b" FOREIGN KEY ("captain") REFERENCES "league"."person"("id") ON DELETE NO ACTION ON UPDATE CASCADE`,
     );
     await queryRunner.query(
       `ALTER TABLE "league"."match" ADD CONSTRAINT "FK_3d22c730699b987b1bd187a9140" FOREIGN KEY ("home") REFERENCES "league"."team"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
