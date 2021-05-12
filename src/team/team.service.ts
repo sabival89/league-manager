@@ -55,45 +55,19 @@ export class TeamService {
         if (teamExists.length)
           return new BadRequestException('Team name already exists');
 
-        // Check if the coach and captain of the new team actually have
-        // their roles as coach and/or captain
-        const validateRoles: HttpException = await this.memberRepository
-          .findOneOrFail({ where: { id: createTeamDto.coach } })
-          .then(async (member) => {
-            if (member.role !== MemberRole.coach)
-              return new BadRequestException(
-                'This member is not a coach. Please assign a coach.',
-              );
+        // Validate coach and captain roles
+        const validateRoles: HttpException = await this.validateRoles(
+          createTeamDto,
+        );
 
-            if (Object.keys(createTeamDto).indexOf(MemberRole.captain) > -1)
-              return await this.memberRepository
-                .findOneOrFail({ where: { id: createTeamDto.captain } })
-                .then(async (member) => {
-                  if (member.role !== MemberRole.captain)
-                    return new BadRequestException(
-                      'This member is not a captain. Please assign a captain.',
-                    );
-                })
-                .catch(
-                  () =>
-                    new InternalServerErrorException(
-                      'The id you provided for captain does not exist',
-                    ),
-                );
-          })
-          .catch(
-            () =>
-              new InternalServerErrorException(
-                'The id you provided for coach does not exist',
-              ),
-          );
-
-        // Create the new team
+        // Reject team creation process if roles are invalid
         if (validateRoles instanceof HttpException) {
           return validateRoles;
         } else {
+          // Instantiate team with raw DTO
           const domain: Team = TeamMapper.toDomain(createTeamDto);
 
+          // Creat the new team
           return await this.teamRepository
             .save(domain)
             .then(
@@ -371,6 +345,44 @@ export class TeamService {
             message: 'Team does not exist',
             sql_error: error,
           }),
+      );
+  }
+
+  /**
+   * Check if the coach and captain of the new team actually have their roles as coach and/or captain
+   * @param createTeamDto
+   * @returns
+   */
+  async validateRoles(createTeamDto: CreateTeamDto) {
+    return await this.memberRepository
+      .findOneOrFail({ where: { id: createTeamDto.coach } })
+      .then(async (member) => {
+        if (member.role !== MemberRole.coach)
+          return new BadRequestException(
+            'This member is not a coach. Please assign a coach.',
+          );
+
+        if (Object.keys(createTeamDto).indexOf(MemberRole.captain) > -1)
+          return await this.memberRepository
+            .findOneOrFail({ where: { id: createTeamDto.captain } })
+            .then(async (member) => {
+              if (member.role !== MemberRole.captain)
+                return new BadRequestException(
+                  'This member is not a captain. Please assign a captain.',
+                );
+            })
+            .catch(
+              () =>
+                new InternalServerErrorException(
+                  'The id you provided for captain does not exist',
+                ),
+            );
+      })
+      .catch(
+        () =>
+          new InternalServerErrorException(
+            'The id you provided for coach does not exist',
+          ),
       );
   }
 }
