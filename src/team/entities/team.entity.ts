@@ -7,7 +7,7 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { Member } from '../../member/entities/member.entity';
-import { TeamStatus } from '../../core/enums/team-status.enum';
+import { TeamStatusEnum } from '../../core/enums/team-status.enum';
 
 @Entity({ schema: 'league' })
 export class Team {
@@ -27,8 +27,12 @@ export class Team {
   @JoinColumn({ name: 'captain' })
   captain: string;
 
-  @Column({ type: 'enum', enum: TeamStatus, default: TeamStatus.inactive })
-  status: TeamStatus;
+  @Column({
+    type: 'enum',
+    enum: TeamStatusEnum,
+    default: TeamStatusEnum.inactive,
+  })
+  status: TeamStatusEnum;
 
   @OneToMany(() => Member, (member) => member.team_id, { onUpdate: 'CASCADE' })
   member: Member[];
@@ -38,7 +42,7 @@ export class Team {
     name: string,
     coach: string,
     captain: string,
-    status: TeamStatus,
+    status: TeamStatusEnum,
   ) {
     this.id = id;
     this.name = name;

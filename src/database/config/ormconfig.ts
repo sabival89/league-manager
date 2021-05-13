@@ -3,7 +3,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 // const config: ConnectionOptions = {
 //   type: 'postgres',
-//   host: '192.168.183.18',
+//   host: '172.29.139.106',
 //   port: 5432,
 //   username: 'vaduaka',
 //   password: 'protected',

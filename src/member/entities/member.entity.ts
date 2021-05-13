@@ -1,5 +1,5 @@
-import { MemberRole } from '../../core/enums/member-role.enum';
-import { MemberStatus } from '../../core/enums/member-status.enum';
+import { MemberRoleEnum } from '../../core/enums/member-role.enum';
+import { MemberStatusEnum } from '../../core/enums/member-status.enum';
 import { Person } from '../../person/entities/person.entity';
 import { ChildEntity, Column, JoinColumn, ManyToOne } from 'typeorm';
 import { Team } from '../../team/entities/team.entity';
@@ -28,16 +28,15 @@ export class Member extends Person {
     phone: string,
     email: string,
     dob: Date,
-    role: MemberRole,
-    age: number,
-    status?: MemberStatus,
+    role: MemberRoleEnum,
+    status?: MemberStatusEnum,
     balance?: number,
     team_id?: string,
     stats?: { shotsOnGoal: number },
   ) {
-    super(id, name, last_name, phone, email, dob, role, age, status);
-    this.role = role;
-    this.status = status ?? MemberStatus.inactive;
+    super(id, name, last_name, phone, email, dob, role, status);
+    this.role = role ?? MemberRoleEnum.striker;
+    this.status = status ?? MemberStatusEnum.inactive;
     this.balance = balance ?? 100;
     this.team_id = team_id;
     this.stats = stats;

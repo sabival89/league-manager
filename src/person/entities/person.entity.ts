@@ -1,5 +1,5 @@
-import { MemberRole } from '../../core/enums/member-role.enum';
-import { MemberStatus } from '../../core/enums/member-status.enum';
+import { MemberRoleEnum } from '../../core/enums/member-role.enum';
+import { MemberStatusEnum } from '../../core/enums/member-status.enum';
 import { Column, Entity, PrimaryColumn, TableInheritance } from 'typeorm';
 
 @Entity({ schema: 'league' })
@@ -23,14 +23,15 @@ export class Person {
   @Column({ type: 'date' })
   dob: Date;
 
-  @Column({ type: 'enum', enum: MemberRole })
-  role: MemberRole;
+  @Column({ type: 'enum', enum: MemberRoleEnum })
+  role: MemberRoleEnum;
 
-  @Column({ type: 'enum', enum: MemberStatus, default: MemberStatus.active })
-  status: MemberStatus;
-
-  @Column()
-  age: number;
+  @Column({
+    type: 'enum',
+    enum: MemberStatusEnum,
+    default: MemberStatusEnum.active,
+  })
+  status: MemberStatusEnum;
 
   constructor(
     id: string,
@@ -39,9 +40,8 @@ export class Person {
     phone: string,
     email: string,
     dob: Date,
-    role: MemberRole,
-    age: number,
-    status: MemberStatus,
+    role: MemberRoleEnum,
+    status: MemberStatusEnum,
   ) {
     this.id = id;
     this.name = name;
@@ -50,7 +50,6 @@ export class Person {
     this.email = email;
     this.dob = dob;
     this.role = role;
-    this.age = age;
     this.status = status;
   }
 }

@@ -18,6 +18,7 @@ export class MatchMapper {
       raw.away_score,
       raw.played,
       raw.location,
+      raw.referee,
     );
   }
 
@@ -36,6 +37,7 @@ export class MatchMapper {
       raw.away_score,
       raw.played,
       raw.location,
+      raw.referee,
     );
   }
 }

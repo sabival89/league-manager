@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsUUID, Max, Min } from 'class-validator';
 import { LocationEnum } from '../../core/enums/location.enum';
-import { EnumProps } from '../../core/enums/utilities/enum-properties.enum';
+import { EnumProps } from '../../core/utilities/enum-properties.enum';
 
 export class CreateMatchDto {
   @ApiProperty({ example: '6c7eff25-f0e7-4e55-ab44-782695dc3ac4' })
@@ -37,4 +37,8 @@ export class CreateMatchDto {
     )}`,
   })
   location: LocationEnum;
+
+  @ApiProperty({ example: '6c7eff25-f0e7-4e55-ab44-782695dc3ac4' })
+  @IsUUID()
+  referee: string;
 }

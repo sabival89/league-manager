@@ -1,7 +1,7 @@
 /**
  * Enum for member statuses
  */
-export enum MemberStatus {
+export enum MemberStatusEnum {
   active = 'active',
   inactive = 'inactive',
   suspended = 'suspended',

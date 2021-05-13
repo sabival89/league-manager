@@ -1,6 +1,14 @@
 import { Team } from '../../team/entities/team.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { LocationEnum } from '../../core/enums/location.enum';
+import { Staff } from '../../staff/entities/staff.entity';
 
 @Entity({ schema: 'league' })
 export class Match {
@@ -29,6 +37,11 @@ export class Match {
   @Column({ type: 'enum', enum: LocationEnum })
   location: LocationEnum;
 
+  @Column({ type: 'uuid' })
+  @OneToOne(() => Staff, (staff) => staff.id, { onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'referee' })
+  referee: string;
+
   constructor(
     id: string,
     home: string,
@@ -37,6 +50,7 @@ export class Match {
     away_score: number,
     played: Date,
     location: LocationEnum,
+    referee: string,
   ) {
     this.id = id;
     this.home = home;
@@ -45,5 +59,6 @@ export class Match {
     this.away_score = away_score;
     this.played = played;
     this.location = location;
+    this.referee = referee;
   }
 }

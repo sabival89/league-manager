@@ -4,6 +4,8 @@ import { MemberModule } from './member/member.module';
 import { TeamModule } from './team/team.module';
 import { PersonModule } from './person/person.module';
 import { MatchModule } from './match/match.module';
+import { StaffModule } from './staff/staff.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { MatchModule } from './match/match.module';
     TeamModule,
     PersonModule,
     MatchModule,
+    StaffModule,
+    AuditModule,
   ],
   controllers: [],
   providers: [],

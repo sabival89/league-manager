@@ -3,7 +3,7 @@ import { Team } from '../entities/team.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateTeamDto } from '../dto/update-team.dto';
 import { UpdateTeamStatusDto } from '../dto/update-team-status.dto';
-import { TeamStatus } from 'src/core/enums/team-status.enum';
+import { TeamStatusEnum } from '../../core/enums/team-status.enum';
 
 export class TeamMapper {
   /**
@@ -17,7 +17,7 @@ export class TeamMapper {
       raw.name,
       raw.coach,
       raw.captain,
-      TeamStatus.inactive,
+      TeamStatusEnum.inactive,
     );
   }
 

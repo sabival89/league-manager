@@ -14,8 +14,8 @@ import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { MemberRole } from '../core/enums/member-role.enum';
-import { MemberStatus } from '../core/enums/member-status.enum';
+import { MemberRoleEnum } from '../core/enums/member-role.enum';
+import { MemberStatusEnum } from '../core/enums/member-status.enum';
 import { UpdateTeamStatusDto } from './dto/update-team-status.dto';
 import { TeamStatsResponse } from './entities/team-response.entity';
 
@@ -62,13 +62,13 @@ export class TeamController {
    * @returns
    */
 
-  @ApiQuery({ name: 'role', enum: MemberRole, required: false })
-  @ApiQuery({ name: 'status', enum: MemberStatus, required: false })
+  @ApiQuery({ name: 'role', enum: MemberRoleEnum, required: false })
+  @ApiQuery({ name: 'status', enum: MemberStatusEnum, required: false })
   @Get(':id/member')
   findTeamMembers(
     @Param('id', ParseUUIDPipe) teamId: string,
-    @Query('role') role: MemberRole,
-    @Query('status') status: MemberStatus,
+    @Query('role') role: MemberRoleEnum,
+    @Query('status') status: MemberStatusEnum,
   ) {
     return this.teamService.findTeamMembers(teamId, role, status);
   }

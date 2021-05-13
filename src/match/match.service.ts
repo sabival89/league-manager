@@ -9,7 +9,6 @@ import { League_OKException } from '../core/exceptions/league-ok.exception';
 import { TeamRepository } from '../team/repositories/team.repository';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
-import { Match } from './entities/match.entity';
 import { MatchMapper } from './mappers/match.map';
 import { MatchRepository } from './repositories/match.repository';
 
@@ -93,16 +92,12 @@ export class MatchService {
       .findOneOrFail(matchId)
       .then(async (match) => {
         return await this.matchRepository
-          .createQueryBuilder()
-          .update(Match)
-          .set(
+          .save(
             MatchMapper.toDomainUpdate(matchId, {
               ...match,
               ...updateMatchDto,
             }),
           )
-          .where('id = :id', { id: matchId })
-          .execute()
           .then(() => new League_OKException('Match was updated successfully'))
           .catch((error) => new InternalServerErrorException(error.message));
       })
@@ -117,9 +112,9 @@ export class MatchService {
   async removeMatch(matchId: string) {
     return await this.matchRepository
       .findOneOrFail(matchId)
-      .then(async () => {
+      .then(async (match) => {
         return await this.matchRepository
-          .delete(matchId)
+          .remove(match)
           .then(() => new League_OKException('Match was deleted successfully'))
           .catch((error) => new InternalServerErrorException(error));
       })

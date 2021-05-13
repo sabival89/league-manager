@@ -5,11 +5,10 @@ import {
   IsEnum,
   IsMobilePhone,
   MaxLength,
-  Min,
   MinLength,
 } from 'class-validator';
-import { MemberRole } from 'src/core/enums/member-role.enum';
-import { EnumProps } from 'src/core/enums/utilities/enum-properties.enum';
+import { MemberRoleEnum } from 'src/core/enums/member-role.enum';
+import { EnumProps } from 'src/core/utilities/enum-properties.enum';
 
 export class CreatePersonDto {
   @ApiProperty({ example: 'Valentine' })
@@ -34,16 +33,12 @@ export class CreatePersonDto {
   @IsDateString({ strict: true })
   dob: Date;
 
-  @ApiProperty({ example: EnumProps.joinEnum(MemberRole) })
-  @IsEnum(MemberRole, {
+  @ApiProperty({ example: EnumProps.joinEnum(MemberRoleEnum) })
+  @IsEnum(MemberRoleEnum, {
     message: `Role must match one of the following: ${EnumProps.joinEnum(
-      MemberRole,
+      MemberRoleEnum,
       'OR',
     )}`,
   })
-  role: MemberRole;
-
-  @ApiProperty({ example: 19 })
-  @Min(18)
-  age: number;
+  role: MemberRoleEnum;
 }

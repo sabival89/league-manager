@@ -1,7 +1,7 @@
 /**
  * enum of rteam statuses
  */
-export enum TeamStatus {
+export enum TeamStatusEnum {
   active = 'active',
   inactive = 'inactive',
 }

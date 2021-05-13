@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { League_OKException } from '../core/exceptions/league-ok.exception';
-import { MemberRole } from '../core/enums/member-role.enum';
-import { MemberStatus } from '../core/enums/member-status.enum';
+import { MemberRoleEnum } from '../core/enums/member-role.enum';
+import { MemberStatusEnum } from '../core/enums/member-status.enum';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
@@ -16,7 +16,6 @@ import { TeamMapper } from './mapper/team.map';
 import { TeamRepository } from './repositories/team.repository';
 import { UpdateTeamStatusDto } from './dto/update-team-status.dto';
 import { MemberRepository } from '../member/repositories/member.repository';
-import { Member } from '../member/entities/member.entity';
 import { MatchRepository } from '../match/repositories/match.repository';
 import { TeamStatsResponse } from './entities/team-response.entity';
 
@@ -44,8 +43,6 @@ export class TeamService {
 
   /**
    * Create a new team
-   * @TODO
-   * - Use 'cascade' to update members table with coach and captain IDs
    * @param createTeamDto
    */
   async createTeam(createTeamDto: CreateTeamDto) {
@@ -74,20 +71,12 @@ export class TeamService {
               async (team) =>
                 // Add coach to team
                 await this.memberRepository
-                  .createQueryBuilder()
-                  .update(Member)
-                  .set({ team_id: team.id })
-                  .where('id = :id', { id: team.coach })
-                  .execute()
+                  .save({ team_id: team.id, id: team.coach })
                   .then(
                     async () =>
                       // Add captain to team
                       await this.memberRepository
-                        .createQueryBuilder()
-                        .update(Member)
-                        .set({ team_id: team.id })
-                        .where('id = :id', { id: team.captain })
-                        .execute()
+                        .save({ team_id: team.id, id: team.captain })
                         .then(
                           () =>
                             new League_OKException({
@@ -210,8 +199,8 @@ export class TeamService {
    */
   async findTeamMembers(
     teamId: string,
-    memberRole?: MemberRole,
-    memberStatus?: MemberStatus,
+    memberRole?: MemberRoleEnum,
+    memberStatus?: MemberStatusEnum,
   ) {
     // Build conditions for the optional query parameters
     const { role, status }: Record<string, string | boolean> = {
@@ -269,16 +258,12 @@ export class TeamService {
       .then(
         async (team) =>
           await this.teamRepository
-            .createQueryBuilder()
-            .update(Team)
-            .set(
+            .save(
               TeamMapper.toUpdateDomain(teamId, {
                 ...team,
                 ...updateTeamDto,
               }),
             )
-            .where('id = :id', { id: team.id })
-            .execute()
             .then(() => new League_OKException('Team was successfully updated'))
             .catch((error) => new InternalServerErrorException(error.detail)),
       )
@@ -300,16 +285,12 @@ export class TeamService {
       .then(
         async (team) =>
           await this.teamRepository
-            .createQueryBuilder()
-            .update(Team)
-            .set(
+            .save(
               TeamMapper.toUpdateDomain(team.id, {
                 ...team,
                 ...updateTeamStatusDto,
               }),
             )
-            .where('id = :id', { id: team.id })
-            .execute()
             .then(
               () => new League_OKException(`Status was successfully updated`),
             )
@@ -335,7 +316,7 @@ export class TeamService {
       .then(
         async (team) =>
           await this.teamRepository
-            .delete(team.id)
+            .remove(team)
             .then(() => new League_OKException('Team was successfully removed'))
             .catch((error) => new InternalServerErrorException(error.message)),
       )
@@ -357,16 +338,16 @@ export class TeamService {
     return await this.memberRepository
       .findOneOrFail({ where: { id: createTeamDto.coach } })
       .then(async (member) => {
-        if (member.role !== MemberRole.coach)
+        if (member.role !== MemberRoleEnum.coach)
           return new BadRequestException(
             'This member is not a coach. Please assign a coach.',
           );
 
-        if (Object.keys(createTeamDto).indexOf(MemberRole.captain) > -1)
+        if (Object.keys(createTeamDto).indexOf(MemberRoleEnum.captain) > -1)
           return await this.memberRepository
             .findOneOrFail({ where: { id: createTeamDto.captain } })
             .then(async (member) => {
-              if (member.role !== MemberRole.captain)
+              if (member.role !== MemberRoleEnum.captain)
                 return new BadRequestException(
                   'This member is not a captain. Please assign a captain.',
                 );
