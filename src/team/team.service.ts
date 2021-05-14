@@ -244,10 +244,6 @@ export class TeamService {
 
   /**
    * Update a given team
-   *
-   * @Todo
-   *  - There is a max number of members per team
-   * - captain or coach must belong to the subject team
    * @param teamId
    * @param updateTeamDto
    * @returns
@@ -330,7 +326,8 @@ export class TeamService {
   }
 
   /**
-   * Check if the coach and captain of the new team actually have their roles as coach and/or captain
+   * Check if the coach and captain of the new team
+   * actually have their roles as coach and/or captain
    * @param createTeamDto
    * @returns
    */

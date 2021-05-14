@@ -11,6 +11,14 @@ import leagueLogger from './logger';
  * @param props Audit properties
  * @returns
  */
+
+/**
+ * Audit action event
+ * @param repository The audit repository
+ * @param event Subscriver event
+ * @param props Audit properties
+ * @returns
+ */
 const auditEvent = async (
   repository: AuditRepository,
   event: any,

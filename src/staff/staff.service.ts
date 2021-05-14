@@ -41,7 +41,7 @@ export class StaffService {
   }
 
   /**
-   *
+   * Retrieve all staff info
    * @returns
    */
   async findAllStaff() {
@@ -51,7 +51,7 @@ export class StaffService {
   }
 
   /**
-   *
+   * Retrieve a given staff info
    * @param staffId
    * @returns
    */
@@ -71,7 +71,7 @@ export class StaffService {
   }
 
   /**
-   *
+   * Update a given staff's info
    * @param staffId
    * @param updateStaffDto
    * @returns
@@ -94,7 +94,7 @@ export class StaffService {
   }
 
   /**
-   *
+   * Remove a given staff
    * @param staffId
    * @returns
    */

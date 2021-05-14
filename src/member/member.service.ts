@@ -27,6 +27,7 @@ export class MemberService {
    * Maximum number of members per team
    */
   private readonly MAX_MEMBER_PER_TEAM = 11;
+
   /**
    * Inject dependencies
    * @param memberRepository
@@ -140,7 +141,6 @@ export class MemberService {
 
   /**
    * Update the profile of a given member
-   * @TODO - MAX TEAM MEMBER
    * @param memberId
    * @param updateMemberDto
    * @returns
