@@ -1,0 +1,27 @@
+version: '3.1'
+services:
+  app:
+    build: .
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - postgres
+    container_name: league-manager
+    ports:
+      - 3001:3000
+    environment:
+      POSTGRES_USER: vaduaka
+      POSTGRES_PASSWORD: protected
+      POSTGRES_DB: league
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: host.docker.internal
+  postgres:
+    image: postgres
+    container_name: league
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: vaduaka
+      POSTGRES_PASSWORD: protected
+      POSTGRES_DB: league
