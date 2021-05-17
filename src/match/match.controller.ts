@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  HttpException,
 } from '@nestjs/common';
 import { MatchService } from './match.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ValidationPipe } from '../member/pipes/league-validation.pipe';
+import { Match } from './entities/match.entity';
 
 @ApiTags('Match')
 @Controller('match')
@@ -25,8 +27,8 @@ export class MatchController {
    * @returns
    */
   @Post()
-  createMatch(@Body(new ValidationPipe()) createMatchDto: CreateMatchDto) {
-    return this.matchService.createMatch(createMatchDto);
+  async createMatch(@Body(new ValidationPipe()) createMatchDto: CreateMatchDto):Promise<HttpException> {
+    return await this.matchService.createMatch(createMatchDto);
   }
 
   /**
@@ -35,8 +37,8 @@ export class MatchController {
    * @returns
    */
   @Get(':id')
-  findOneMatch(@Param('id', ParseUUIDPipe) matchId: string) {
-    return this.matchService.findOneMatch(matchId);
+  async findOneMatch(@Param('id', ParseUUIDPipe) matchId: string):Promise<HttpException | Match>  {
+    return await this.matchService.findOneMatch(matchId);
   }
 
   /**
@@ -46,11 +48,11 @@ export class MatchController {
    * @returns
    */
   @Patch(':id')
-  updateMatch(
+  async updateMatch(
     @Param('id', ParseUUIDPipe) matchId: string,
     @Body(new ValidationPipe()) updateMatchDto: UpdateMatchDto,
-  ) {
-    return this.matchService.updateMatch(matchId, updateMatchDto);
+  ):Promise<HttpException> {
+    return await this.matchService.updateMatch(matchId, updateMatchDto);
   }
 
   /**
@@ -59,7 +61,7 @@ export class MatchController {
    * @returns
    */
   @Delete(':id')
-  removeMatch(@Param('id', ParseUUIDPipe) matchId: string) {
-    return this.matchService.removeMatch(matchId);
+  async removeMatch(@Param('id', ParseUUIDPipe) matchId: string):Promise<HttpException> {
+    return await this.matchService.removeMatch(matchId);
   }
 }

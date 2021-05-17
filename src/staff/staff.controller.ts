@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  HttpException,
 } from '@nestjs/common';
 import { StaffService } from './staff.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ValidationPipe } from '../member/pipes/league-validation.pipe';
+import { Staff } from './entities/staff.entity';
 
 @ApiTags('Staff')
 @Controller('staff')
@@ -25,8 +27,8 @@ export class StaffController {
    * @returns
    */
   @Post()
-  create(@Body(new ValidationPipe()) createStaffDto: CreateStaffDto) {
-    return this.staffService.createStaff(createStaffDto);
+  async create(@Body(new ValidationPipe()) createStaffDto: CreateStaffDto):Promise<HttpException> {
+    return await this.staffService.createStaff(createStaffDto);
   }
 
   /**
@@ -34,8 +36,8 @@ export class StaffController {
    * @returns
    */
   @Get()
-  findAll() {
-    return this.staffService.findAllStaff();
+  async findAll():Promise<HttpException | Array<Staff>>  {
+    return await this.staffService.findAllStaff();
   }
 
   /**
@@ -44,8 +46,8 @@ export class StaffController {
    * @returns
    */
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) staffId: string) {
-    return this.staffService.findOneStaff(staffId);
+  async findOne(@Param('id', ParseUUIDPipe) staffId: string):Promise<Staff | HttpException> {
+    return await this.staffService.findOneStaff(staffId);
   }
 
   /**
@@ -55,11 +57,11 @@ export class StaffController {
    * @returns
    */
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) staffId: string,
     @Body(new ValidationPipe()) updateStaffDto: UpdateStaffDto,
-  ) {
-    return this.staffService.updateStaff(staffId, updateStaffDto);
+  ): Promise<HttpException> {
+    return await this.staffService.updateStaff(staffId, updateStaffDto);
   }
 
   /**
@@ -68,7 +70,7 @@ export class StaffController {
    * @returns
    */
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) staffId: string) {
-    return this.staffService.removeStaff(staffId);
+  async remove(@Param('id', ParseUUIDPipe) staffId: string):Promise<HttpException> {
+    return await this.staffService.removeStaff(staffId);
   }
 }

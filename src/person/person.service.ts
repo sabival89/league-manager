@@ -19,7 +19,7 @@ export class PersonService {
    * @returns
    */
   async findOnePerson(personId: string) {
-    return this.personRepository
+    return await this.personRepository
       .findOneOrFail(personId)
       .catch((error) => new InternalServerErrorException(error.message));
   }

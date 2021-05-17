@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  HttpStatus,
+  InternalServerErrorException,
+  HttpException,
 } from '@nestjs/common';
 import { MemberService } from './member.service';
 import { CreateMemberDto } from './dto/create-member.dto';
@@ -15,6 +18,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { UpdateMemberStatusDto } from './dto/update-status-member.dto';
 import { CreateMemberPaymentDto } from './dto/create-payment.member.dto';
 import { ValidationPipe } from './pipes/league-validation.pipe';
+import { League_OKException } from 'src/core/exceptions/league-ok.exception';
+import { Member } from './entities/member.entity';
 
 @ApiTags('Member')
 @Controller('member')
@@ -26,8 +31,8 @@ export class MemberController {
    * @returns
    */
   @Get()
-  async findAllMembers() {
-    return this.memberService.findAllMembers();
+  async findAllMembers():Promise<Array<Member> | HttpException>  {
+    return await this.memberService.findAllMembers();
   }
 
   /**
@@ -36,8 +41,8 @@ export class MemberController {
    */
 
   @Get('free-agents')
-  async findAllFreeAgents() {
-    return this.memberService.findAllFreeAgents();
+  async findAllFreeAgents():Promise<Array<Member> | HttpException> {
+    return await this.memberService.findAllFreeAgents();
   }
 
   /**
@@ -46,8 +51,8 @@ export class MemberController {
    * @returns
    */
   @Get(':id')
-  async findOneMember(@Param('id', ParseUUIDPipe) memberId: string) {
-    return this.memberService.findOneMember(memberId);
+  async findOneMember(@Param('id', ParseUUIDPipe) memberId: string):Promise<HttpException | Member> {
+    return await this.memberService.findOneMember(memberId);
   }
 
   /**
@@ -58,8 +63,8 @@ export class MemberController {
   @Post()
   async createMember(
     @Body(new ValidationPipe()) createMemberDto: CreateMemberDto,
-  ) {
-    return this.memberService.createMember(createMemberDto);
+  ):Promise<HttpException> {
+    return await this.memberService.createMember(createMemberDto);
   }
 
   /**
@@ -72,8 +77,8 @@ export class MemberController {
   async createPayment(
     @Param('id', ParseUUIDPipe) memberId: string,
     @Body(new ValidationPipe()) createMemberPaymentDto: CreateMemberPaymentDto,
-  ) {
-    return this.memberService.createPayment(memberId, createMemberPaymentDto);
+  ):Promise<HttpException> {
+    return await this.memberService.createPayment(memberId, createMemberPaymentDto);
   }
 
   /**
@@ -86,8 +91,8 @@ export class MemberController {
   async updateMember(
     @Param('id', ParseUUIDPipe) memberId: string,
     @Body(new ValidationPipe()) updateMemberDto: UpdateMemberDto,
-  ) {
-    return this.memberService.updateMember(memberId, updateMemberDto);
+  ):Promise<HttpException> {
+    return await this.memberService.updateMember(memberId, updateMemberDto);
   }
 
   /**Handler for updating a given member's status
@@ -100,8 +105,8 @@ export class MemberController {
   async updateMemberStatus(
     @Param('id', ParseUUIDPipe) memberId: string,
     @Body(new ValidationPipe()) updateMemberStatusDto: UpdateMemberStatusDto,
-  ) {
-    return this.memberService.updateMemberStatus(
+  ):Promise<HttpException> {
+    return await this.memberService.updateMemberStatus(
       memberId,
       updateMemberStatusDto,
     );
@@ -113,7 +118,7 @@ export class MemberController {
    * @returns
    */
   @Delete(':id')
-  async removeMember(@Param('id', ParseUUIDPipe) memberId: string) {
-    return this.memberService.removeMember(memberId);
+  async removeMember(@Param('id', ParseUUIDPipe) memberId: string):Promise<HttpException> {
+    return await this.memberService.removeMember(memberId);
   }
 }
