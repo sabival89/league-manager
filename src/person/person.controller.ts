@@ -1,6 +1,7 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, ParseUUIDPipe } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
+import { Person } from './entities/person.entity';
 
 @ApiTags('Person')
 @Controller('person')
@@ -14,7 +15,7 @@ export class PersonController {
    */
   @ApiProperty()
   @Get(':id')
-  findOnePerson(@Param('id', ParseUUIDPipe) personId: string) {
-    return this.personService.findOnePerson(personId);
+  async findOnePerson(@Param('id', ParseUUIDPipe) personId: string):Promise<HttpException | Person> {
+    return await this.personService.findOnePerson(personId);
   }
 }

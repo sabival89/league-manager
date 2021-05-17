@@ -9,6 +9,7 @@ import {
   Query,
   ParseUUIDPipe,
   ValidationPipe,
+  HttpException,
 } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -18,6 +19,9 @@ import { MemberRoleEnum } from '../core/enums/member-role.enum';
 import { MemberStatusEnum } from '../core/enums/member-status.enum';
 import { UpdateTeamStatusDto } from './dto/update-team-status.dto';
 import { TeamStatsResponse } from './entities/team-response.entity';
+import { Team } from './entities/team.entity';
+import { Member } from 'src/member/entities/member.entity';
+import { Match } from 'src/match/entities/match.entity';
 
 @ApiTags('Team')
 @Controller('team')
@@ -30,8 +34,8 @@ export class TeamController {
    * @returns
    */
   @Post()
-  createTeam(@Body(new ValidationPipe()) createTeamDto: CreateTeamDto) {
-    return this.teamService.createTeam(createTeamDto);
+  async createTeam(@Body(new ValidationPipe()) createTeamDto: CreateTeamDto): Promise<HttpException> {
+    return await this.teamService.createTeam(createTeamDto);
   }
 
   /**
@@ -40,7 +44,7 @@ export class TeamController {
    * @returns
    */
   @Get(':id')
-  findOneTeam(@Param('id', ParseUUIDPipe) teamId: string) {
+  async findOneTeam(@Param('id', ParseUUIDPipe) teamId: string): Promise<HttpException | Team> {
     return this.teamService.findOneTeam(teamId);
   }
 
@@ -50,8 +54,8 @@ export class TeamController {
    * @returns
    */
   @Get(':id/matches')
-  findTeamMatches(@Param('id', ParseUUIDPipe) teamId: string) {
-    return this.teamService.findTeamMatches(teamId);
+  async findTeamMatches(@Param('id', ParseUUIDPipe) teamId: string): Promise<Array<Match> | HttpException> {
+    return await this.teamService.findTeamMatches(teamId);
   }
 
   /**
@@ -65,12 +69,12 @@ export class TeamController {
   @ApiQuery({ name: 'role', enum: MemberRoleEnum, required: false })
   @ApiQuery({ name: 'status', enum: MemberStatusEnum, required: false })
   @Get(':id/member')
-  findTeamMembers(
+  async findTeamMembers(
     @Param('id', ParseUUIDPipe) teamId: string,
     @Query('role') role: MemberRoleEnum,
     @Query('status') status: MemberStatusEnum,
-  ) {
-    return this.teamService.findTeamMembers(teamId, role, status);
+  ): Promise<HttpException | Array<Member>> {
+    return await this.teamService.findTeamMembers(teamId, role, status);
   }
 
   /**
@@ -80,10 +84,10 @@ export class TeamController {
    */
   @ApiOkResponse({ type: TeamStatsResponse })
   @Get(':id/stats')
-  findTeamStats(
+  async findTeamStats(
     @Param('id', ParseUUIDPipe) teamId: string,
   ): Promise<TeamStatsResponse> {
-    return this.teamService.findTeamStats(teamId);
+    return await this.teamService.findTeamStats(teamId);
   }
 
   /**
@@ -93,11 +97,11 @@ export class TeamController {
    * @returns
    */
   @Patch(':id')
-  updateTeam(
+  async updateTeam(
     @Param('id', ParseUUIDPipe) teamId: string,
     @Body(new ValidationPipe()) updateTeamDto: UpdateTeamDto,
-  ) {
-    return this.teamService.updateTeam(teamId, updateTeamDto);
+  ): Promise<HttpException> {
+    return await this.teamService.updateTeam(teamId, updateTeamDto);
   }
 
   /**
@@ -107,11 +111,11 @@ export class TeamController {
    * @returns
    */
   @Patch(':id/status')
-  updateTeamStatus(
+  async updateTeamStatus(
     @Param('id', ParseUUIDPipe) teamId: string,
     @Body(new ValidationPipe()) updateTeamDto: UpdateTeamStatusDto,
-  ) {
-    return this.teamService.updateTeamStatus(teamId, updateTeamDto);
+  ): Promise<HttpException> {
+    return await this.teamService.updateTeamStatus(teamId, updateTeamDto);
   }
 
   /**
@@ -120,7 +124,7 @@ export class TeamController {
    * @returns
    */
   @Delete(':id')
-  removeTeam(@Param('id', ParseUUIDPipe) teamId: string) {
-    return this.teamService.removeTeam(teamId);
+  async removeTeam(@Param('id', ParseUUIDPipe) teamId: string): Promise<HttpException> {
+    return await this.teamService.removeTeam(teamId);
   }
 }
